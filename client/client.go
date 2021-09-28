@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/huseyinbabal/demory/proto"
 	"google.golang.org/grpc"
 	"log"
 )
