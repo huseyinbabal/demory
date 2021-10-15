@@ -19,10 +19,13 @@ import (
 )
 
 var (
-	bootstrap   = flag.Bool("bootstrap", false, "Bootstrap RAFT Cluster")
-	port        = flag.Int("port", 0, "Port")
-	nodeId      = flag.String("node_id", "", "Node ID")
-	nodeAddress = flag.String("node_address", "", "Node Address")
+	bootstrap           = flag.Bool("bootstrap", false, "Bootstrap RAFT Cluster")
+	port                = flag.Int("port", 0, "Port")
+	nodeId              = flag.String("node_id", "", "Node ID")
+	nodeAddress         = flag.String("node_address", "", "Node Address")
+	discoveryStrategy   = flag.String("discovery_strategy", "kubernetes", "Discovery Strategy for finding members to form cluster.Possible values:port,kubernetes")
+	kubernetesNamespace = flag.String("kubernetes_namespace", "default", "Kubernetes namespace to be used for endpoint list")
+	kubernetesService   = flag.String("kubernetes_service", "", "Kubernetes service to make endpoint label selector list")
 )
 
 func main() {
@@ -68,10 +71,20 @@ func main() {
 		if err := cluster.Error(); err != nil {
 			log.Fatalf("bootstrap error %v", err)
 		}
-	} else {
-		discovery.NewPortDiscovery(8000, 8100, "localhost", *nodeAddress, *nodeId).Discover()
 	}
 
+	var memberDiscovery discovery.Discovery
+	if *discoveryStrategy == "port" {
+		memberDiscovery = discovery.NewPortDiscovery(8000, 8100, "localhost", *nodeAddress, *nodeId, r)
+	} else if *discoveryStrategy == "kubernetes" {
+		memberDiscovery = discovery.NewKubernetesDiscovery(*kubernetesNamespace, *kubernetesService, r)
+	} else {
+		log.Fatalf("invalid discovery %s", *discoveryStrategy)
+	}
+	discoveryErr := memberDiscovery.Discover()
+	if discoveryErr != nil {
+		log.Fatalf("discovery err %v", discoveryErr)
+	}
 	socket, socketErr := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if socketErr != nil {
 		log.Fatalf("socket error %v", socketErr)
