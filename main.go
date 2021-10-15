@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"github.com/Jille/raft-grpc-leader-rpc/leaderhealth"
 	transport "github.com/Jille/raft-grpc-transport"
@@ -10,6 +9,7 @@ import (
 	boltdb "github.com/hashicorp/raft-boltdb"
 	proto "github.com/huseyinbabal/demory-proto/golang/demory"
 	"github.com/huseyinbabal/demory/discovery"
+	"github.com/huseyinbabal/demory/node"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
@@ -18,22 +18,15 @@ import (
 	"path/filepath"
 )
 
-var (
-	bootstrap           = flag.Bool("bootstrap", false, "Bootstrap RAFT Cluster")
-	port                = flag.Int("port", 0, "Port")
-	nodeId              = flag.String("node_id", "", "Node ID")
-	nodeAddress         = flag.String("node_address", "", "Node Address")
-	discoveryStrategy   = flag.String("discovery_strategy", "kubernetes", "Discovery Strategy for finding members to form cluster.Possible values:port,kubernetes")
-	kubernetesNamespace = flag.String("kubernetes_namespace", "default", "Kubernetes namespace to be used for endpoint list")
-	kubernetesService   = flag.String("kubernetes_service", "", "Kubernetes service to make endpoint label selector list")
-)
-
 func main() {
-	flag.Parse()
+	nodeConfig, nodeConfigErr := node.LoadConfig()
+	if nodeConfigErr != nil {
+		log.Fatalf("node config error %v", nodeConfigErr)
+	}
 	config := raft.DefaultConfig()
-	config.LocalID = raft.ServerID(*nodeId)
+	config.LocalID = raft.ServerID(nodeConfig.NodeID)
 	fsm := NewDemory()
-	basedir := filepath.Join("/tmp", *nodeId)
+	basedir := filepath.Join("/tmp", nodeConfig.NodeID)
 	mkdirErr := os.MkdirAll(basedir, os.ModePerm)
 	if mkdirErr != nil {
 		log.Fatalf("mkdir error %v", mkdirErr)
@@ -56,13 +49,13 @@ func main() {
 		log.Fatalf("raft error %v", raftErr)
 	}
 
-	if *bootstrap {
+	if nodeConfig.Bootstrap {
 		cfg := raft.Configuration{
 			Servers: []raft.Server{
 				{
 					Suffrage: raft.Voter,
-					ID:       raft.ServerID(*nodeId),
-					Address:  raft.ServerAddress(*nodeAddress),
+					ID:       raft.ServerID(nodeConfig.NodeID),
+					Address:  raft.ServerAddress(nodeConfig.NodeAddress),
 				},
 			},
 		}
@@ -74,18 +67,18 @@ func main() {
 	}
 
 	var memberDiscovery discovery.Discovery
-	if *discoveryStrategy == "port" {
-		memberDiscovery = discovery.NewPortDiscovery(8000, 8100, "localhost", *nodeAddress, *nodeId, r)
-	} else if *discoveryStrategy == "kubernetes" {
-		memberDiscovery = discovery.NewKubernetesDiscovery(*kubernetesNamespace, *kubernetesService, r)
+	if nodeConfig.DiscoveryStrategy == "port" {
+		memberDiscovery = discovery.NewPortDiscovery(8000, 8100, "localhost", nodeConfig.NodeAddress, nodeConfig.NodeID, r)
+	} else if nodeConfig.DiscoveryStrategy == "kubernetes" {
+		memberDiscovery = discovery.NewKubernetesDiscovery(nodeConfig.KubernetesNamespace, nodeConfig.KubernetesService, r)
 	} else {
-		log.Fatalf("invalid discovery %s", *discoveryStrategy)
+		log.Fatalf("invalid discovery %s", nodeConfig.DiscoveryStrategy)
 	}
 	discoveryErr := memberDiscovery.Discover()
 	if discoveryErr != nil {
 		log.Fatalf("discovery err %v", discoveryErr)
 	}
-	socket, socketErr := net.Listen("tcp", fmt.Sprintf(":%d", *port))
+	socket, socketErr := net.Listen("tcp", fmt.Sprintf(":%d", nodeConfig.Port))
 	if socketErr != nil {
 		log.Fatalf("socket error %v", socketErr)
 	}
