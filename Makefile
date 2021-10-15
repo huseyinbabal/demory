@@ -1,12 +1,14 @@
 clean:
+	killall demory
 	rm -rf /tmp/80*
+
 bootstrap:
 	DEMORY_NODE_ID=8080 \
 	DEMORY_BOOTSTRAP=true \
 	DEMORY_NODE_ADDRESS=localhost:8080 \
 	DEMORY_PORT=8080 \
-	DEMORY_DISCOVERY_STRATEGY=port \
-	go run .
+	DEMORY_DISCOVERY_STRATEGY=port go run .
+
 cluster-9:
 	number=8081 ; while [[ $$number -le 8090 ]] ; do \
 		DEMORY_NODE_ID=$$number \
