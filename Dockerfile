@@ -4,5 +4,5 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o demory .
 
 FROM scratch
-COPY --from=builder /go/src/demory /demory
+COPY --from=builder /go/src/app/demory /demory
 ENTRYPOINT ["/demory"]
