@@ -2,7 +2,7 @@ name: Push Docker Image
 on:
   push:
     tags:
-      - *
+      - '*'
 
 jobs:
   docker:
