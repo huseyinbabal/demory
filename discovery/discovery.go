@@ -1,10 +1,10 @@
 package discovery
 
-type DiscoveryStrategy string
+type Strategy string
 
 const (
-	Port       = "port"
-	Kubernetes = "kubernetes"
+	StrategyPort       = "port"
+	StrategyKubernetes = "kubernetes"
 )
 
 type Discovery interface {

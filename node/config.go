@@ -1,19 +1,20 @@
 package node
 
 import (
+	"github.com/huseyinbabal/demory/discovery"
 	"github.com/spf13/viper"
 	"log"
 	"os"
 )
 
 type Config struct {
-	NodeID              string `mapstructure:"NODE_ID"`
-	Bootstrap           bool   `mapstructure:"BOOTSTRAP"`
-	NodeAddress         string `mapstructure:"NODE_ADDRESS"`
-	Port                int    `mapstructure:"PORT"`
-	DiscoveryStrategy   string `mapstructure:"DISCOVERY_STRATEGY"`
-	KubernetesService   string `mapstructure:"KUBERNETES_SERVICE"`
-	KubernetesNamespace string `mapstructure:"KUBERNETES_NAMESPACE"`
+	NodeID              string             `mapstructure:"NODE_ID"`
+	Bootstrap           bool               `mapstructure:"BOOTSTRAP"`
+	NodeAddress         string             `mapstructure:"NODE_ADDRESS"`
+	Port                int                `mapstructure:"PORT"`
+	DiscoveryStrategy   discovery.Strategy `mapstructure:"DISCOVERY_STRATEGY"`
+	KubernetesService   string             `mapstructure:"KUBERNETES_SERVICE"`
+	KubernetesNamespace string             `mapstructure:"KUBERNETES_NAMESPACE"`
 }
 
 func LoadConfig() (config Config, e error) {

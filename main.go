@@ -67,9 +67,9 @@ func main() {
 	}
 
 	var memberDiscovery discovery.Discovery
-	if nodeConfig.DiscoveryStrategy == "port" {
+	if nodeConfig.DiscoveryStrategy == discovery.StrategyPort {
 		memberDiscovery = discovery.NewPortDiscovery(8000, 8100, "localhost", nodeConfig.NodeAddress, nodeConfig.NodeID, r)
-	} else if nodeConfig.DiscoveryStrategy == "kubernetes" {
+	} else if nodeConfig.DiscoveryStrategy == discovery.StrategyKubernetes {
 		memberDiscovery = discovery.NewKubernetesDiscovery(nodeConfig.KubernetesNamespace, nodeConfig.KubernetesService, r)
 	} else {
 		log.Fatalf("invalid discovery %s", nodeConfig.DiscoveryStrategy)
