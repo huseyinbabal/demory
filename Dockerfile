@@ -1,8 +1,8 @@
 FROM golang:alpine as builder
 WORKDIR /go/src/app
 COPY . .
-RUN CGO_ENABLED=0 go install -ldflags '-extldflags "-static"'
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o demory .
 
 FROM scratch
-COPY --from=builder /go/bin/demory /demory
+COPY --from=builder /go/src/demory /demory
 ENTRYPOINT ["/demory"]
