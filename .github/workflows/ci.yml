@@ -28,6 +28,11 @@ jobs:
           export PATH=$PATH:$(go env GOPATH)/bin
           go mod download
 
+      - name: Lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+
       - name: Test Coverage
         uses: paambaati/codeclimate-action@v3.0.0
         env:
