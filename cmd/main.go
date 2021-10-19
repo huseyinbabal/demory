@@ -7,6 +7,7 @@ import (
 	"github.com/Jille/raftadmin"
 	"github.com/hashicorp/raft"
 	boltdb "github.com/hashicorp/raft-boltdb"
+	"github.com/huseyinbabal/demory"
 	proto "github.com/huseyinbabal/demory-proto/golang/demory"
 	"github.com/huseyinbabal/demory/discovery"
 	"github.com/huseyinbabal/demory/node"
@@ -25,7 +26,7 @@ func main() {
 	}
 	config := raft.DefaultConfig()
 	config.LocalID = raft.ServerID(nodeConfig.NodeID)
-	fsm := NewDemory()
+	fsm := demory.NewDemory()
 	basedir := filepath.Join("/tmp", nodeConfig.NodeID)
 	mkdirErr := os.MkdirAll(basedir, os.ModePerm)
 	if mkdirErr != nil {
@@ -48,6 +49,7 @@ func main() {
 	if raftErr != nil {
 		log.Fatalf("raft error %v", raftErr)
 	}
+
 
 	if nodeConfig.Bootstrap {
 		cfg := raft.Configuration{
@@ -84,10 +86,7 @@ func main() {
 	}
 
 	server := grpc.NewServer()
-	proto.RegisterDemoryServer(server, &rpcInterface{
-		raft:   r,
-		demory: fsm,
-	})
+	proto.RegisterDemoryServer(server, demory.NewRPCInterface(r, fsm))
 	manager.Register(server)
 	leaderhealth.Setup(r, server, []string{"Leader"})
 	raftadmin.Register(server, r)
