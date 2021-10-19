@@ -1,5 +1,6 @@
 # Demory
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/huseyinbabal/demory)](https://goreportcard.com/report/github.com/huseyinbabal/demory)
 [![Maintainability](https://api.codeclimate.com/v1/badges/9db10ff69cca5a0481ab/maintainability)](https://codeclimate.com/github/huseyinbabal/demory/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/9db10ff69cca5a0481ab/test_coverage)](https://codeclimate.com/github/huseyinbabal/demory/test_coverage)
 ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/huseyinbabal/demory?label=Docker%20Image)
