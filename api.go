@@ -35,7 +35,10 @@ func (d *Demory) Apply(log *raft.Log) interface{} {
 	defer d.mutex.Unlock()
 
 	var data proto.MapPutRequest
-	json.Unmarshal(log.Data, &data)
+	err := json.Unmarshal(log.Data, &data)
+	if err != nil {
+		return err
+	}
 	d.mapStore[data.Key] = data.Value
 	return nil
 }

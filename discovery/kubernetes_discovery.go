@@ -52,9 +52,9 @@ func (k kubernetesDiscovery) Discover() error {
 	ticker := time.NewTicker(5 * time.Second)
 	go func() {
 		for {
-			select {
-			case <-ticker.C:
-				k.discover()
+			<-ticker.C
+			if err := k.discover(); err != nil {
+				fmt.Printf("failed to discover cluster nodes %v.\n", err)
 			}
 		}
 	}()

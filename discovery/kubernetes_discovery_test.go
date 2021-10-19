@@ -33,5 +33,8 @@ func TestNewKubernetesDiscovery(t *testing.T) {
 		},
 	})
 	client := NewKubernetesDiscoveryWithClient(clientset, "default", "nginx")
-	client.Discover()
+	err := client.Discover()
+	if err != nil {
+		t.Errorf("discovery failed %v", err)
+	}
 }

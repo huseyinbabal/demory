@@ -1,6 +1,7 @@
 package node
 
 import (
+	"fmt"
 	"github.com/huseyinbabal/demory/discovery"
 	"github.com/spf13/viper"
 	"log"
@@ -19,13 +20,13 @@ type Config struct {
 
 func LoadConfig() (config Config, e error) {
 	viper.SetEnvPrefix("DEMORY")
-	viper.BindEnv("NODE_ID")
-	viper.BindEnv("BOOTSTRAP")
-	viper.BindEnv("NODE_ADDRESS")
-	viper.BindEnv("PORT")
-	viper.BindEnv("DISCOVERY_STRATEGY")
-	viper.BindEnv("KUBERNETES_SERVICE")
-	viper.BindEnv("KUBERNETES_NAMESPACE")
+	bindEnv("NODE_ID")
+	bindEnv("BOOTSTRAP")
+	bindEnv("NODE_ADDRESS")
+	bindEnv("PORT")
+	bindEnv("DISCOVERY_STRATEGY")
+	bindEnv("KUBERNETES_SERVICE")
+	bindEnv("KUBERNETES_NAMESPACE")
 	viper.AutomaticEnv()
 	viper.SetConfigType("yaml")
 	configFile := viper.GetString("config")
@@ -38,4 +39,11 @@ func LoadConfig() (config Config, e error) {
 	}
 	e = viper.Unmarshal(&config)
 	return
+}
+
+func bindEnv(name string) {
+	err := viper.BindEnv(name)
+	if err != nil {
+		fmt.Printf("failed to bind env variable: %s, err: %v.\n", name, err)
+	}
 }
