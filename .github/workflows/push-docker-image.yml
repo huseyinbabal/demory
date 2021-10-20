@@ -1,4 +1,5 @@
 name: Push Docker Image
+
 on:
   push:
     tags:
@@ -10,14 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: action/checkoud@v2
+
       - name: Extract Release Version
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build and Push
         uses: docker/build-push-action@v2
         with:
