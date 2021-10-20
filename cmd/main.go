@@ -29,27 +29,31 @@ func main() {
 	fsm := demory.NewDemory()
 	basedir := filepath.Join("/tmp", nodeConfig.NodeID)
 	mkdirErr := os.MkdirAll(basedir, os.ModePerm)
+
 	if mkdirErr != nil {
 		log.Fatalf("mkdir error %v", mkdirErr)
 	}
 	logStore, logStoreErr := boltdb.NewBoltStore(filepath.Join(basedir, "logs.dat"))
+
 	if logStoreErr != nil {
 		log.Fatalf("logstore error %v", logStoreErr)
 	}
 	stableStore, stableStoreErr := boltdb.NewBoltStore(filepath.Join(basedir, "stable.dat"))
+
 	if stableStoreErr != nil {
 		log.Fatalf("stablestore error %v", stableStoreErr)
 	}
 	snapshotStore, snapshotStoreErr := raft.NewFileSnapshotStore(basedir, 3, os.Stderr)
+
 	if snapshotStoreErr != nil {
 		log.Fatalf("snapshotstore error %v", snapshotStoreErr)
 	}
 	manager := transport.New(raft.ServerAddress("localhost:8081"), []grpc.DialOption{grpc.WithInsecure()})
 	r, raftErr := raft.NewRaft(config, fsm, logStore, stableStore, snapshotStore, manager.Transport())
+
 	if raftErr != nil {
 		log.Fatalf("raft error %v", raftErr)
 	}
-
 
 	if nodeConfig.Bootstrap {
 		cfg := raft.Configuration{
