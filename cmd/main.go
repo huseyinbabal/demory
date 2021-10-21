@@ -24,6 +24,7 @@ func main() {
 	if nodeConfigErr != nil {
 		log.Fatalf("node config error %v", nodeConfigErr)
 	}
+
 	config := raft.DefaultConfig()
 	config.LocalID = raft.ServerID(nodeConfig.NodeID)
 	fsm := demory.NewDemory()
@@ -33,21 +34,25 @@ func main() {
 	if mkdirErr != nil {
 		log.Fatalf("mkdir error %v", mkdirErr)
 	}
+
 	logStore, logStoreErr := boltdb.NewBoltStore(filepath.Join(basedir, "logs.dat"))
 
 	if logStoreErr != nil {
 		log.Fatalf("logstore error %v", logStoreErr)
 	}
+
 	stableStore, stableStoreErr := boltdb.NewBoltStore(filepath.Join(basedir, "stable.dat"))
 
 	if stableStoreErr != nil {
 		log.Fatalf("stablestore error %v", stableStoreErr)
 	}
+
 	snapshotStore, snapshotStoreErr := raft.NewFileSnapshotStore(basedir, 3, os.Stderr)
 
 	if snapshotStoreErr != nil {
 		log.Fatalf("snapshotstore error %v", snapshotStoreErr)
 	}
+
 	manager := transport.New(raft.ServerAddress("localhost:8081"), []grpc.DialOption{grpc.WithInsecure()})
 	r, raftErr := raft.NewRaft(config, fsm, logStore, stableStore, snapshotStore, manager.Transport())
 
@@ -73,6 +78,7 @@ func main() {
 	}
 
 	var memberDiscovery discovery.Discovery
+
 	if nodeConfig.DiscoveryStrategy == discovery.StrategyPort {
 		memberDiscovery = discovery.NewPortDiscovery(8000, 8100, "localhost", nodeConfig.NodeAddress, nodeConfig.NodeID, r)
 	} else if nodeConfig.DiscoveryStrategy == discovery.StrategyKubernetes {
@@ -80,10 +86,13 @@ func main() {
 	} else {
 		log.Fatalf("invalid discovery %s", nodeConfig.DiscoveryStrategy)
 	}
+
 	discoveryErr := memberDiscovery.Discover()
+
 	if discoveryErr != nil {
 		log.Fatalf("discovery err %v", discoveryErr)
 	}
+
 	socket, socketErr := net.Listen("tcp", fmt.Sprintf(":%d", nodeConfig.Port))
 	if socketErr != nil {
 		log.Fatalf("socket error %v", socketErr)
@@ -96,6 +105,7 @@ func main() {
 	raftadmin.Register(server, r)
 	reflection.Register(server)
 	serveErr := server.Serve(socket)
+
 	if serveErr != nil {
 		log.Fatalf("serve error %v", serveErr)
 	}
