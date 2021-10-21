@@ -25,8 +25,6 @@ jobs:
 
       - name: Lint
         uses: golangci/golangci-lint-action@v2
-        with:
-          version: v2.5.2
 
       - name: Test Coverage
         uses: paambaati/codeclimate-action@v3.0.0
