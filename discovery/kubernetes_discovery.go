@@ -29,6 +29,7 @@ func NewKubernetesDiscovery(namespace string, service string, r *raft.Raft) *kub
 		log.Fatalf("Failed to get k8s in cluster config %v", configErr)
 	}
 	clientset, clientsetErr := kubernetes.NewForConfig(config)
+
 	if clientsetErr != nil {
 		log.Fatalf("Failed to get clientset %v", clientsetErr)
 	}
