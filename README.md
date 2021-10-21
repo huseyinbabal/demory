@@ -9,4 +9,4 @@
 Demory is a Cloud-Native Distributed In-Memory Database based on the RAFT Protocol. 
 
 ## Howto Use
-Demory is still in progress, will be updated soon
+Demory is still in progress, will be updated soon...
