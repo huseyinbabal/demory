@@ -22,14 +22,14 @@ type Demory struct {
 
 var _ raft.FSM = &Demory{}
 
-// NewDemory for creating new instance of in-memory database
+// NewDemory for creating new instance of in-memory database.
 func NewDemory() *Demory {
 	return &Demory{
 		mapStore: make(map[string]string),
 	}
 }
 
-// Apply is for storing log message to stable store within RAFT protocol
+// Apply is for storing log message to stable store within RAFT protocol.
 func (d *Demory) Apply(log *raft.Log) interface{} {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -43,12 +43,12 @@ func (d *Demory) Apply(log *raft.Log) interface{} {
 	return nil
 }
 
-// Snapshot is for taking the snapshot of existing logs
+// Snapshot is for taking the snapshot of existing logs.
 func (d *Demory) Snapshot() (raft.FSMSnapshot, error) {
 	panic("implement me")
 }
 
-// Restore is used for getting last recent data into stable store
+// Restore is used for getting last recent data into stable store.
 func (d *Demory) Restore(closer io.ReadCloser) error {
 	panic("implement me")
 }
@@ -61,7 +61,7 @@ type RPCInterface struct {
 }
 
 // NewRPCInterface creates an instance of RPCInterface to serve data
-// related endpoints to consumers
+// related endpoints to consumers.
 func NewRPCInterface(raft *raft.Raft, demory *Demory) *RPCInterface {
 	return &RPCInterface{
 		raft:   raft,
@@ -69,7 +69,7 @@ func NewRPCInterface(raft *raft.Raft, demory *Demory) *RPCInterface {
 	}
 }
 
-// Put saves data into store
+// Put saves data into store.
 func (r RPCInterface) Put(ctx context.Context, req *proto.MapPutRequest) (*emptypb.Empty, error) {
 	bytes, bytesErr := json.Marshal(req)
 	if bytesErr != nil {
@@ -82,13 +82,13 @@ func (r RPCInterface) Put(ctx context.Context, req *proto.MapPutRequest) (*empty
 	return new(emptypb.Empty), nil
 }
 
-// Get retrieves data from store
+// Get retrieves data from store.
 func (r RPCInterface) Get(ctx context.Context, req *proto.MapGetRequest) (*proto.MapGetResponse, error) {
 	return &proto.MapGetResponse{Value: r.demory.mapStore[req.Key]}, nil
 }
 
 // JoinToCluster is  used by port discovery to allow joining cluster
-// By using leader node
+// By using leader node.
 func (r RPCInterface) JoinToCluster(ctx context.Context, request *proto.JoinToClusterRequest) (*proto.JoinToClusterResponse, error) {
 	if r.raft.State() == raft.Leader {
 		r.raft.AddVoter(raft.ServerID(request.ServerId), raft.ServerAddress(request.ServerAddress), request.PreviousIndex, time.Second)

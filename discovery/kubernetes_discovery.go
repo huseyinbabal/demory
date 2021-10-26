@@ -54,7 +54,7 @@ func (k kubernetesDiscovery) Discover() error {
 		for {
 			<-ticker.C
 			if err := k.discover(); err != nil {
-				fmt.Printf("failed to discover cluster nodes %v.\n", err)
+				log.Printf("failed to discover cluster nodes %v.\n", err)
 			}
 		}
 	}()
@@ -63,7 +63,7 @@ func (k kubernetesDiscovery) Discover() error {
 
 func (k kubernetesDiscovery) discover() error {
 
-	fmt.Println("discovering...")
+	log.Println("discovering...")
 	list, err := k.Clientset.CoreV1().Endpoints(k.Namespace).List(context.Background(), v1.ListOptions{
 		LabelSelector: fmt.Sprintf("%s=%s", "app", k.Service),
 	})
@@ -77,6 +77,6 @@ func (k kubernetesDiscovery) discover() error {
 
 		}
 	}
-	fmt.Println(endpoints)
+	log.Println(endpoints)
 	return nil
 }

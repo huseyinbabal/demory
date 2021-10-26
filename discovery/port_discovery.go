@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/raft"
 	proto "github.com/huseyinbabal/demory-proto/golang/demory"
 	"google.golang.org/grpc"
+	"log"
 	"sync"
 )
 
@@ -51,7 +52,7 @@ func (p *portDiscovery) dial(host string, port int) {
 	dest := fmt.Sprintf("%s:%d", host, port)
 	conn, err := grpc.Dial(dest, grpc.WithInsecure())
 	if err != nil {
-		fmt.Println("failed to connect " + dest)
+		log.Println("failed to connect " + dest)
 	} else {
 		defer conn.Close()
 		client := proto.NewDemoryClient(conn)
@@ -61,9 +62,9 @@ func (p *portDiscovery) dial(host string, port int) {
 			PreviousIndex: 0,
 		})
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else {
-			fmt.Println("success")
+			log.Println("success")
 		}
 	}
 }

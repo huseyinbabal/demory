@@ -48,7 +48,7 @@ func main() {
 			if valueErr != nil {
 				log.Fatalf("get err %v", valueErr)
 			}
-			fmt.Println(value)
+			log.Println(value)
 			time.Sleep(time.Second)
 		}
 	}()

@@ -1,7 +1,6 @@
 package node
 
 import (
-	"fmt"
 	"github.com/huseyinbabal/demory/discovery"
 	"github.com/spf13/viper"
 	"log"
@@ -44,6 +43,6 @@ func LoadConfig() (config Config, e error) {
 func bindEnv(name string) {
 	err := viper.BindEnv(name)
 	if err != nil {
-		fmt.Printf("failed to bind env variable: %s, err: %v.\n", name, err)
+		log.Printf("failed to bind env variable: %s, err: %v.\n", name, err)
 	}
 }
