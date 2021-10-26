@@ -70,6 +70,9 @@ func (k kubernetesDiscovery) discover() error {
 	}
 	var endpoints []string
 	for _, item := range list.Items {
+		if len(item.Subsets) == 0 {
+			continue
+		}
 		for i := 0; i < len(item.Subsets[0].Addresses); i++ {
 			endpoints = append(endpoints, fmt.Sprintf("%s:%d", item.Subsets[0].Addresses[i].IP, item.Subsets[0].Ports[0].Port))
 
