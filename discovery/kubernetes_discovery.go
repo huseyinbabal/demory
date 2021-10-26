@@ -63,7 +63,7 @@ func (k kubernetesDiscovery) discover() error {
 
 	log.Println("discovering...")
 	list, err := k.Clientset.CoreV1().Endpoints(k.Namespace).List(context.Background(), v1.ListOptions{
-		LabelSelector: fmt.Sprintf("%s=%s", "app", k.Service),
+		LabelSelector: fmt.Sprintf("%s=%s", "app.kubernetes.io/name", k.Service),
 	})
 	if err != nil {
 		return err
