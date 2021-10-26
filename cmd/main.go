@@ -53,28 +53,26 @@ func main() {
 		log.Fatalf("snapshotstore error %v", snapshotStoreErr)
 	}
 
-	manager := transport.New(raft.ServerAddress("localhost:8081"), []grpc.DialOption{grpc.WithInsecure()})
+	manager := transport.New(raft.ServerAddress(nodeConfig.NodeAddress), []grpc.DialOption{grpc.WithInsecure()})
 	r, raftErr := raft.NewRaft(config, fsm, logStore, stableStore, snapshotStore, manager.Transport())
 
 	if raftErr != nil {
 		log.Fatalf("raft error %v", raftErr)
 	}
 
-	if nodeConfig.Bootstrap {
-		cfg := raft.Configuration{
-			Servers: []raft.Server{
-				{
-					Suffrage: raft.Voter,
-					ID:       raft.ServerID(nodeConfig.NodeID),
-					Address:  raft.ServerAddress(nodeConfig.NodeAddress),
-				},
+	cfg := raft.Configuration{
+		Servers: []raft.Server{
+			{
+				Suffrage: raft.Voter,
+				ID:       raft.ServerID(nodeConfig.NodeID),
+				Address:  raft.ServerAddress(nodeConfig.NodeAddress),
 			},
-		}
+		},
+	}
 
-		cluster := r.BootstrapCluster(cfg)
-		if err := cluster.Error(); err != nil {
-			log.Fatalf("bootstrap error %v", err)
-		}
+	cluster := r.BootstrapCluster(cfg)
+	if err := cluster.Error(); err == nil {
+		log.Println("Cluster is initialized successfully.")
 	}
 
 	var memberDiscovery discovery.Discovery

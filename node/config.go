@@ -9,7 +9,6 @@ import (
 
 type Config struct {
 	NodeID              string             `mapstructure:"NODE_ID"`
-	Bootstrap           bool               `mapstructure:"BOOTSTRAP"`
 	NodeAddress         string             `mapstructure:"NODE_ADDRESS"`
 	Port                int                `mapstructure:"PORT"`
 	DiscoveryStrategy   discovery.Strategy `mapstructure:"DISCOVERY_STRATEGY"`
@@ -20,7 +19,6 @@ type Config struct {
 func LoadConfig() (config Config, e error) {
 	viper.SetEnvPrefix("DEMORY")
 	bindEnv("NODE_ID")
-	bindEnv("BOOTSTRAP")
 	bindEnv("NODE_ADDRESS")
 	bindEnv("PORT")
 	bindEnv("DISCOVERY_STRATEGY")
