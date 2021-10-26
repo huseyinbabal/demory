@@ -7,10 +7,8 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
+	"k8s.io/client-go/rest"
 	"log"
-	"path/filepath"
 	"time"
 )
 
@@ -24,7 +22,7 @@ type kubernetesDiscovery struct {
 var _ Discovery = &kubernetesDiscovery{}
 
 func NewKubernetesDiscovery(namespace string, service string, r *raft.Raft) *kubernetesDiscovery {
-	config, configErr := clientcmd.BuildConfigFromFlags("", filepath.Join(homedir.HomeDir(), ".kube", "config"))
+	config, configErr := rest.InClusterConfig()
 	if configErr != nil {
 		log.Fatalf("Failed to get k8s in cluster config %v", configErr)
 	}
