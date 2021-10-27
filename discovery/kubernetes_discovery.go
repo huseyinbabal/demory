@@ -67,7 +67,9 @@ func (k kubernetesDiscovery) Discover() error {
 }
 
 func (k kubernetesDiscovery) discover() error {
-
+	if k.Raft.State() != raft.Leader {
+		return nil
+	}
 	log.Println("discovering...")
 	list, err := k.Clientset.CoreV1().Endpoints(k.Namespace).List(context.Background(), v1.ListOptions{
 		LabelSelector: fmt.Sprintf("%s=%s", "app.kubernetes.io/name", k.Service),
