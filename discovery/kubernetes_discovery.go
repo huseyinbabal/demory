@@ -67,8 +67,26 @@ func (k kubernetesDiscovery) Discover() error {
 }
 
 func (k kubernetesDiscovery) discover() error {
+	if !k.ClusterInitialized && len(k.Raft.GetConfiguration().Configuration().Servers) == 0 {
+		cfg := raft.Configuration{
+			Servers: []raft.Server{
+				{
+					Suffrage: raft.Voter,
+					ID:       raft.ServerID(k.NodeID),
+					Address:  raft.ServerAddress(k.NodeAddress),
+				},
+			},
+		}
 
-	log.Println("discovering...")
+		cluster := k.Raft.BootstrapCluster(cfg)
+		if err := cluster.Error(); err == nil {
+			log.Println("Cluster is initialized successfully.")
+		}
+		k.ClusterInitialized = true
+	}
+	if k.Raft.Leader() != raft.ServerAddress(k.NodeAddress) {
+		return nil
+	}
 	list, err := k.Clientset.CoreV1().Endpoints(k.Namespace).List(context.Background(), v1.ListOptions{
 		LabelSelector: fmt.Sprintf("%s=%s", "app.kubernetes.io/name", k.Service),
 	})
@@ -79,22 +97,6 @@ func (k kubernetesDiscovery) discover() error {
 	for _, item := range list.Items {
 		if len(item.Subsets) == 0 {
 			continue
-		}
-		if len(item.Subsets[0].Addresses) == 1 && item.Subsets[0].Addresses[0].IP == k.NodeAddress {
-			cfg := raft.Configuration{
-				Servers: []raft.Server{
-					{
-						Suffrage: raft.Voter,
-						ID:       raft.ServerID(k.NodeID),
-						Address:  raft.ServerAddress(k.NodeAddress),
-					},
-				},
-			}
-
-			cluster := k.Raft.BootstrapCluster(cfg)
-			if err := cluster.Error(); err == nil {
-				log.Println("Cluster is initialized successfully.")
-			}
 		}
 		for i := 0; i < len(item.Subsets[0].Addresses); i++ {
 
