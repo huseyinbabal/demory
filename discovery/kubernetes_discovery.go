@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/hashicorp/raft"
-	"github.com/huseyinbabal/demory/node"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
@@ -25,7 +24,7 @@ type kubernetesDiscovery struct {
 
 var _ Discovery = &kubernetesDiscovery{}
 
-func NewKubernetesDiscovery(nodeConfig *node.Config, r *raft.Raft) *kubernetesDiscovery {
+func NewKubernetesDiscovery(namespace string, service string, nodeAddress string, nodeID string, r *raft.Raft) *kubernetesDiscovery {
 	config, configErr := rest.InClusterConfig()
 	if configErr != nil {
 		log.Fatalf("Failed to get k8s in cluster config %v", configErr)
@@ -35,10 +34,10 @@ func NewKubernetesDiscovery(nodeConfig *node.Config, r *raft.Raft) *kubernetesDi
 		log.Fatalf("Failed to get clientset %v", clientsetErr)
 	}
 	return &kubernetesDiscovery{
-		Namespace:          nodeConfig.KubernetesNamespace,
-		Service:            nodeConfig.KubernetesService,
-		NodeAddress:        nodeConfig.NodeAddress,
-		NodeID:             nodeConfig.NodeID,
+		Namespace:          namespace,
+		Service:            service,
+		NodeAddress:        nodeAddress,
+		NodeID:             nodeID,
 		Raft:               r,
 		Clientset:          clientset,
 		ClusterInitialized: false,
