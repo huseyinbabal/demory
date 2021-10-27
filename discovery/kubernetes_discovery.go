@@ -8,6 +8,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/rest"
+	"k8s.io/utils/strings/slices"
 	"log"
 	"time"
 )
@@ -74,7 +75,7 @@ func (k kubernetesDiscovery) discover() error {
 	if err != nil {
 		return err
 	}
-	var endpoints []string
+	var endpoints map[string]string
 	for _, item := range list.Items {
 		if len(item.Subsets) == 0 {
 			continue
@@ -96,10 +97,45 @@ func (k kubernetesDiscovery) discover() error {
 			}
 		}
 		for i := 0; i < len(item.Subsets[0].Addresses); i++ {
-			endpoints = append(endpoints, fmt.Sprintf("%s:%d", item.Subsets[0].Addresses[i].IP, item.Subsets[0].Ports[0].Port))
 
+			endpoints[item.Subsets[0].Addresses[i].Hostname] = fmt.Sprintf("%s:%d", item.Subsets[0].Addresses[i].IP, item.Subsets[0].Ports[0].Port)
 		}
 	}
-	log.Println(endpoints)
+	k.refreshClusterMembersIfNeeded(endpoints)
 	return nil
+}
+
+func (k kubernetesDiscovery) refreshClusterMembersIfNeeded(foundMembers map[string]string) {
+	var existingClusterMembers []string
+	var foundClusterMembers []string
+	var membersToAdd map[string]string
+	var membersToRemove []string
+
+	for _, member := range foundMembers {
+		foundClusterMembers = append(foundClusterMembers, member)
+	}
+
+	for _, server := range k.Raft.GetConfiguration().Configuration().Servers {
+		if !slices.Contains(foundClusterMembers, string(server.Address)) {
+			membersToRemove = append(membersToRemove, string(server.ID))
+			k.Raft.RemoveServer(server.ID, 0, time.Second)
+		} else {
+			existingClusterMembers = append(existingClusterMembers, string(server.Address))
+		}
+	}
+
+	for nodeID, nodeAddress := range foundMembers {
+		if !slices.Contains(existingClusterMembers, nodeAddress) {
+			membersToAdd[nodeID] = nodeAddress
+			k.Raft.AddVoter(raft.ServerID(nodeID), raft.ServerAddress(nodeAddress), 0, time.Second)
+		}
+	}
+
+	if len(membersToAdd) > 0 {
+		log.Printf("Found new nodes: %v\n", membersToAdd)
+	}
+
+	if len(membersToRemove) > 0 {
+		log.Printf("Removed nodes: %v\n", membersToRemove)
+	}
 }
