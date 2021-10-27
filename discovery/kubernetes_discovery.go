@@ -67,7 +67,7 @@ func (k kubernetesDiscovery) Discover() error {
 }
 
 func (k kubernetesDiscovery) discover() error {
-	if k.Raft.State() != raft.Leader {
+	if k.Raft.Leader() == raft.ServerAddress(k.NodeAddress) {
 		return nil
 	}
 	log.Println("discovering...")
