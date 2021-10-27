@@ -60,27 +60,12 @@ func main() {
 		log.Fatalf("raft error %v", raftErr)
 	}
 
-	cfg := raft.Configuration{
-		Servers: []raft.Server{
-			{
-				Suffrage: raft.Voter,
-				ID:       raft.ServerID(nodeConfig.NodeID),
-				Address:  raft.ServerAddress(nodeConfig.NodeAddress),
-			},
-		},
-	}
-
-	cluster := r.BootstrapCluster(cfg)
-	if err := cluster.Error(); err == nil {
-		log.Println("Cluster is initialized successfully.")
-	}
-
 	var memberDiscovery discovery.Discovery
 
 	if nodeConfig.DiscoveryStrategy == discovery.StrategyPort {
 		memberDiscovery = discovery.NewPortDiscovery(8000, 8100, "localhost", nodeConfig.NodeAddress, nodeConfig.NodeID, r)
 	} else if nodeConfig.DiscoveryStrategy == discovery.StrategyKubernetes {
-		memberDiscovery = discovery.NewKubernetesDiscovery(nodeConfig.KubernetesNamespace, nodeConfig.KubernetesService, r)
+		memberDiscovery = discovery.NewKubernetesDiscovery(&nodeConfig, r)
 	} else {
 		log.Fatalf("invalid discovery %s", nodeConfig.DiscoveryStrategy)
 	}

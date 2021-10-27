@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/hashicorp/raft"
+	"github.com/huseyinbabal/demory/node"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
@@ -13,15 +14,18 @@ import (
 )
 
 type kubernetesDiscovery struct {
-	Clientset kubernetes.Interface
-	Namespace string
-	Service   string
-	Raft      *raft.Raft
+	Clientset          kubernetes.Interface
+	Namespace          string
+	Service            string
+	NodeAddress        string
+	NodeID             string
+	Raft               *raft.Raft
+	ClusterInitialized bool
 }
 
 var _ Discovery = &kubernetesDiscovery{}
 
-func NewKubernetesDiscovery(namespace string, service string, r *raft.Raft) *kubernetesDiscovery {
+func NewKubernetesDiscovery(nodeConfig *node.Config, r *raft.Raft) *kubernetesDiscovery {
 	config, configErr := rest.InClusterConfig()
 	if configErr != nil {
 		log.Fatalf("Failed to get k8s in cluster config %v", configErr)
@@ -31,10 +35,13 @@ func NewKubernetesDiscovery(namespace string, service string, r *raft.Raft) *kub
 		log.Fatalf("Failed to get clientset %v", clientsetErr)
 	}
 	return &kubernetesDiscovery{
-		Namespace: namespace,
-		Service:   service,
-		Raft:      r,
-		Clientset: clientset,
+		Namespace:          nodeConfig.KubernetesNamespace,
+		Service:            nodeConfig.KubernetesService,
+		NodeAddress:        nodeConfig.NodeAddress,
+		NodeID:             nodeConfig.NodeID,
+		Raft:               r,
+		Clientset:          clientset,
+		ClusterInitialized: false,
 	}
 }
 
@@ -72,6 +79,22 @@ func (k kubernetesDiscovery) discover() error {
 	for _, item := range list.Items {
 		if len(item.Subsets) == 0 {
 			continue
+		}
+		if len(item.Subsets[0].Addresses) == 1 && item.Subsets[0].Addresses[0].IP == k.NodeAddress {
+			cfg := raft.Configuration{
+				Servers: []raft.Server{
+					{
+						Suffrage: raft.Voter,
+						ID:       raft.ServerID(k.NodeID),
+						Address:  raft.ServerAddress(k.NodeAddress),
+					},
+				},
+			}
+
+			cluster := k.Raft.BootstrapCluster(cfg)
+			if err := cluster.Error(); err == nil {
+				log.Println("Cluster is initialized successfully.")
+			}
 		}
 		for i := 0; i < len(item.Subsets[0].Addresses); i++ {
 			endpoints = append(endpoints, fmt.Sprintf("%s:%d", item.Subsets[0].Addresses[i].IP, item.Subsets[0].Ports[0].Port))
