@@ -75,7 +75,7 @@ func (k kubernetesDiscovery) discover() error {
 	if err != nil {
 		return err
 	}
-	var endpoints map[string]string
+	endpoints := make(map[string]string)
 	for _, item := range list.Items {
 		if len(item.Subsets) == 0 {
 			continue
@@ -108,7 +108,7 @@ func (k kubernetesDiscovery) discover() error {
 func (k kubernetesDiscovery) refreshClusterMembersIfNeeded(foundMembers map[string]string) {
 	var existingClusterMembers []string
 	var foundClusterMembers []string
-	var membersToAdd map[string]string
+	membersToAdd := make(map[string]string)
 	var membersToRemove []string
 
 	for _, member := range foundMembers {
