@@ -279,8 +279,8 @@ github.com/hashicorp/raft-boltdb v0.0.0-20210422161416-485fa74b0b01 h1:EfDtu7qY4
 github.com/hashicorp/raft-boltdb v0.0.0-20210422161416-485fa74b0b01/go.mod h1:L6EUYfWjwPIkX9uqJBsGb3fppuOcRx3t7z2joJnIf/g=
 github.com/hashicorp/serf v0.9.5/go.mod h1:UWDWwZeL5cuWDJdl0C6wrvrUwEqtQ4ZKBKKENpqIUyk=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
-github.com/huseyinbabal/demory-proto/golang v1.0.0-rc.7 h1:KYMgbLtN02QaoPvYWvhGxwTqWwTa7ib822Hne5bRzWY=
-github.com/huseyinbabal/demory-proto/golang v1.0.0-rc.7/go.mod h1:tGTv04/QJvt/2UowGyibLO/xgQ7h/dbNmf1yfqboF6k=
+github.com/huseyinbabal/demory-proto/golang v1.0.0-rc.10 h1:5IEswOZjA4vCpbGNpIYBDqspBJ3PpxgNShnvq5Z+Vx4=
+github.com/huseyinbabal/demory-proto/golang v1.0.0-rc.10/go.mod h1:tGTv04/QJvt/2UowGyibLO/xgQ7h/dbNmf1yfqboF6k=
 github.com/huseyinbabal/grpc-multi-resolver v1.0.2 h1:njeQ/tR40bE9Y9z1C9jKnop6ovJaWPsQjwKZx5LLZVg=
 github.com/huseyinbabal/grpc-multi-resolver v1.0.2/go.mod h1:A8+n736wve2rBVW2gmNKsuux3A0+2uivcfyQ2auwDoI=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
