@@ -13,7 +13,7 @@ require (
 	github.com/huseyinbabal/demory-proto/golang v1.0.0-rc.7
 	github.com/huseyinbabal/grpc-multi-resolver v1.0.2
 	github.com/spf13/viper v1.9.0
-	google.golang.org/grpc v1.41.0
+	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
 	k8s.io/api v0.22.3
 	k8s.io/apimachinery v0.22.3
