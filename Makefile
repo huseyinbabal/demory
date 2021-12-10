@@ -1,5 +1,5 @@
 clean:
-	killall demory
+	killall demory || true
 	rm -rf /tmp/80*
 
 bootstrap:
@@ -7,7 +7,7 @@ bootstrap:
 	DEMORY_BOOTSTRAP=true \
 	DEMORY_NODE_ADDRESS=localhost:8080 \
 	DEMORY_PORT=8080 \
-	DEMORY_DISCOVERY_STRATEGY=port go run .
+	DEMORY_DISCOVERY_STRATEGY=port go run ./cmd/.
 
 cluster-9:
 	number=8081 ; while [[ $$number -le 8090 ]] ; do \
@@ -15,6 +15,6 @@ cluster-9:
         DEMORY_BOOTSTRAP=false \
         DEMORY_NODE_ADDRESS=localhost:$$number \
         DEMORY_PORT=$$number \
-        DEMORY_DISCOVERY_STRATEGY=port go run . & \
+        DEMORY_DISCOVERY_STRATEGY=port go run ./cmd/ & \
 		((number = number + 1)) ; \
 	done

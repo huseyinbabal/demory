@@ -3,14 +3,15 @@ package discovery
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/hashicorp/raft"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/rest"
 	"k8s.io/utils/strings/slices"
-	"log"
-	"time"
 )
 
 type kubernetesDiscovery struct {
@@ -99,7 +100,6 @@ func (k kubernetesDiscovery) discover() error {
 			continue
 		}
 		for i := 0; i < len(item.Subsets[0].Addresses); i++ {
-
 			endpoints[item.Subsets[0].Addresses[i].Hostname] = fmt.Sprintf("%s:%d", item.Subsets[0].Addresses[i].IP, item.Subsets[0].Ports[0].Port)
 		}
 	}
