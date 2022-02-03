@@ -1,11 +1,8 @@
 package fsm
 
-type (
-	Func         func() interface{}
-	ApplyRequest struct {
-		Command Func
-	}
-)
+type ApplyRequest struct {
+	Command func() interface{}
+}
 
 type ApplyResponse struct {
 	Data  interface{}

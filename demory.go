@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	proto "github.com/huseyinbabal/demory-proto/golang/demory"
-	"github.com/huseyinbabal/demory/ds/cache"
 	"log"
 	"net"
 	"time"
+
+	proto "github.com/huseyinbabal/demory-proto/golang/demory"
+	"github.com/huseyinbabal/demory/ds/cache"
 
 	"github.com/Jille/raft-grpc-leader-rpc/leaderhealth"
 	"github.com/Jille/raftadmin"
@@ -232,7 +233,6 @@ func (d *Demory) Run() {
 
 	server := grpc.NewServer()
 	proto.RegisterDemoryServer(server, d)
-	d.fsm.Manager.Register(server)
 	leaderhealth.Setup(d.fsm.Raft, server, []string{"Leader"})
 	raftadmin.Register(server, d.fsm.Raft)
 	reflection.Register(server)
