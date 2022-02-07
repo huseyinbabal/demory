@@ -8,7 +8,7 @@ require (
 	github.com/Jille/raftadmin v1.2.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
-	github.com/hashicorp/raft v1.3.2
+	github.com/hashicorp/raft v1.3.4
 	github.com/hashicorp/raft-boltdb v0.0.0-20210422161416-485fa74b0b01
 	github.com/huseyinbabal/demory-proto/golang v1.0.0-rc.7
 	github.com/huseyinbabal/grpc-multi-resolver v1.0.2
