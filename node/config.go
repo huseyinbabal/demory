@@ -1,22 +1,24 @@
 package node
 
 import (
-	"github.com/huseyinbabal/demory/discovery"
-	"github.com/spf13/viper"
 	"log"
 	"os"
+
+	"github.com/spf13/viper"
 )
 
 type Config struct {
-	NodeID              string             `mapstructure:"NODE_ID"`
-	NodeAddress         string             `mapstructure:"NODE_ADDRESS"`
-	Port                int                `mapstructure:"PORT"`
-	DiscoveryStrategy   discovery.Strategy `mapstructure:"DISCOVERY_STRATEGY"`
-	KubernetesService   string             `mapstructure:"KUBERNETES_SERVICE"`
-	KubernetesNamespace string             `mapstructure:"KUBERNETES_NAMESPACE"`
+	NodeID              string `mapstructure:"NODE_ID"`
+	NodeAddress         string `mapstructure:"NODE_ADDRESS"`
+	Port                int    `mapstructure:"PORT"`
+	MinPort             int    `mapstructure:"MIN_PORT"`
+	MaxPort             int    `mapstructure:"MAX_PORT"`
+	DiscoveryStrategy   string `mapstructure:"DISCOVERY_STRATEGY"`
+	KubernetesService   string `mapstructure:"KUBERNETES_SERVICE"`
+	KubernetesNamespace string `mapstructure:"KUBERNETES_NAMESPACE"`
 }
 
-func LoadConfig() (config Config, e error) {
+func LoadConfig() (config *Config, e error) {
 	viper.SetEnvPrefix("DEMORY")
 	bindEnv("NODE_ID")
 	bindEnv("NODE_ADDRESS")
