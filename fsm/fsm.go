@@ -2,21 +2,21 @@ package fsm
 
 import (
 	"encoding/json"
+	transport "github.com/Jille/raft-grpc-transport"
 	"github.com/hashicorp/raft"
 	boltdb "github.com/hashicorp/raft-boltdb"
 	"github.com/huseyinbabal/demory/node"
+	"google.golang.org/grpc"
 	"io"
 	"log"
-	"net"
 	"os"
 	"path/filepath"
 	"sync"
-	"time"
 )
 
 type Fsm struct {
 	Raft    *raft.Raft
-	Manager *raft.NetworkTransport
+	Manager *transport.Manager
 	mutex   sync.RWMutex
 }
 
@@ -53,24 +53,16 @@ func New(nodeConfig node.Config) *Fsm {
 		log.Fatalf("snapshotstore error %v", snapshotStoreErr)
 	}
 
-	//manager := transport.New(raft.ServerAddress(nodeConfig.NodeAddress), []grpc.DialOption{grpc.WithInsecure()})
-	tcpAddr, tcpAddrErr := net.ResolveTCPAddr("tcp", nodeConfig.NodeAddress)
-	if tcpAddrErr != nil {
-		log.Fatalf("failed to resolve a TCP address: %v", tcpAddrErr)
-	}
+	manager := transport.New(raft.ServerAddress(nodeConfig.NodeAddress), []grpc.DialOption{grpc.WithInsecure()})
 
-	transport, transportErr := raft.NewTCPTransport(nodeConfig.NodeAddress, tcpAddr, 2, 10*time.Second, os.Stderr)
-	if transportErr != nil {
-		log.Fatalf("transport err %v", transportErr)
-	}
-	r, raftErr := raft.NewRaft(config, fsm, logStore, stableStore, snapshotStore, transport)
+	r, raftErr := raft.NewRaft(config, fsm, logStore, stableStore, snapshotStore, manager.Transport())
 
 	if raftErr != nil {
 		log.Fatalf("raft error %v", raftErr)
 	}
 	return &Fsm{
 		Raft:    r,
-		Manager: transport,
+		Manager: manager,
 	}
 }
 

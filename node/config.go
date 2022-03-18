@@ -23,6 +23,8 @@ func LoadConfig() (config *Config, e error) {
 	bindEnv("NODE_ID")
 	bindEnv("NODE_ADDRESS")
 	bindEnv("PORT")
+	bindEnv("MIN_PORT")
+	bindEnv("MAX_PORT")
 	bindEnv("DISCOVERY_STRATEGY")
 	bindEnv("KUBERNETES_SERVICE")
 	bindEnv("KUBERNETES_NAMESPACE")

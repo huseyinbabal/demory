@@ -1,6 +1,6 @@
 module github.com/huseyinbabal/demory
 
-go 1.17
+go 1.18
 
 require (
 	github.com/Jille/raft-grpc-leader-rpc v1.1.0

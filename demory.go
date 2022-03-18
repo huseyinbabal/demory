@@ -233,6 +233,7 @@ func (d *Demory) Run() {
 
 	server := grpc.NewServer()
 	proto.RegisterDemoryServer(server, d)
+	d.fsm.Manager.Register(server)
 	leaderhealth.Setup(d.fsm.Raft, server, []string{"Leader"})
 	raftadmin.Register(server, d.fsm.Raft)
 	reflection.Register(server)
